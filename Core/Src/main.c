@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Button.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +53,20 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+	Button_t button_1;
+	uint32_t countPress =0;
+  void btn_press_short_callback(Button_t *btn)
+	{
+		countPress++;
+		if(btn == &button_1)
+		{
+			HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+		}
+	}
+	 void btn_double_click_callback(Button_t *btn)
+	{
+	 	countPress++;
+	}
 /* USER CODE END 0 */
 
 /**
@@ -72,7 +85,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+		button_init(&button_1, BUTTON_1_GPIO_Port, BUTTON_1_Pin);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -85,7 +98,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+	// Button_t button_1;
+  // button_init(button_1,)
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -95,6 +109,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		button_handle(&button_1);
   }
   /* USER CODE END 3 */
 }
@@ -148,17 +163,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PA0 PA1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
